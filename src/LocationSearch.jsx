@@ -4,12 +4,12 @@ import { searchLocations } from "./locationSearch";
 
 const { ui } = SITE_CONFIG;
 
-export default function LocationSearch({ index, onPick }) {
+export default function LocationSearch({ index = [], onPick }) {
   const wrapRef = useRef(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
-  const results = searchLocations(index, query);
+  const results = searchLocations(Array.isArray(index) ? index : [], query);
 
   useEffect(() => {
     function onPointerDown(event) {
@@ -20,6 +20,13 @@ export default function LocationSearch({ index, onPick }) {
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, []);
+
+  function choose(item) {
+    if (!item?.geoid) return;
+    onPick?.(item);
+    setQuery(`${item.name}, ${item.state || ""}`.replace(/,\s*$/, ""));
+    setOpen(false);
+  }
 
   return (
     <div className="location-search" ref={wrapRef}>
@@ -38,10 +45,10 @@ export default function LocationSearch({ index, onPick }) {
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter" && results[0]) {
-            onPick(results[0]);
-            setQuery(`${results[0].name}, ${results[0].state}`);
-            setOpen(false);
+            event.preventDefault();
+            choose(results[0]);
           }
+          if (event.key === "Escape") setOpen(false);
         }}
       />
       {open && query.trim().length >= 2 && (
@@ -55,11 +62,7 @@ export default function LocationSearch({ index, onPick }) {
               key={`${item.type}-${item.geoid}-${item.name}`}
               className="soc-option location-option"
               onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                onPick(item);
-                setQuery(`${item.name}, ${item.state}`);
-                setOpen(false);
-              }}
+              onClick={() => choose(item)}
             >
               <span className="location-option-name">{item.name}</span>
               <span className="location-option-meta">

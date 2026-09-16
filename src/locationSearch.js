@@ -19,7 +19,7 @@ export function buildLocationIndex(cities, countyEntries) {
   const items = [];
   const seen = new Set();
 
-  (cities || []).forEach((city) => {
+  (Array.isArray(cities) ? cities : []).forEach((city) => {
     if (!city?.geoid || !city?.name) return;
     const key = `city:${city.geoid}:${city.name}`;
     if (seen.has(key)) return;
@@ -34,7 +34,7 @@ export function buildLocationIndex(cities, countyEntries) {
     });
   });
 
-  (countyEntries || []).forEach((county) => {
+  (Array.isArray(countyEntries) ? countyEntries : []).forEach((county) => {
     if (!county?.geoid || !county?.name) return;
     items.push({
       type: "county",
@@ -51,16 +51,20 @@ export function buildLocationIndex(cities, countyEntries) {
 export function searchLocations(index, query, limit = 8) {
   const q = String(query || "").trim();
   if (q.length < 2) return [];
+  if (!Array.isArray(index) || index.length === 0) return [];
+
   const scored = [];
   index.forEach((item) => {
+    if (!item?.hay || !item?.name) return;
     if (!matchesQuery(item.hay, q)) return;
-    const name = item.name.toLowerCase();
+    const name = String(item.name).toLowerCase();
     const needle = q.toLowerCase();
     let score = 0;
     if (name === needle) score += 80;
     else if (name.startsWith(needle)) score += 40;
     else if (name.includes(needle)) score += 20;
     if (item.type === "city") score += 8;
+    if (item.state && tokens(q).includes(String(item.state).toLowerCase())) score += 12;
     scored.push({ item, score });
   });
   scored.sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name));
