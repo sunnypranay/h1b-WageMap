@@ -366,3 +366,203 @@ export default function Map() {
       ...options,
     });
   }
+
+  function showCountyPopup(feature, lngLat) {
+    if (!mapRef.current || !feature) return;
+    const lotteryOn = lotteryEnabledRef.current;
+    const state = featureState(feature);
+    const wageTable = wageTableRef.current;
+    const levelInfo = wageTable ? wageTable[feature.properties.GEOID] : null;
+    const hasLevelData = Boolean(levelInfo);
+    const currentLevel = feature.properties.level;
+    const chance = currentLevel > 0 ? lottery.selectionByLevel[currentLevel] : undefined;
+    const levelLabel = !hasLevelData
+      ? levels.labels.noData
+      : currentLevel === 0 || currentLevel === undefined
+        ? levels.labels.belowLevel
+        : `${levels.labels.levelPrefix} ${levels.keys[currentLevel - 1]}`;
+    const levelClass =
+      !hasLevelData || currentLevel === 0 || currentLevel === undefined
+        ? "level-none"
+        : "has-level";
+    const levelColor =
+      Number.isInteger(currentLevel) && levels.colors[currentLevel]
+        ? levels.colors[currentLevel]
+        : mapConfig.paint.noLevelBadge;
+    const salaryFloors = levels.keys.map((k) => {
+      const hourly = levelInfo?.[k];
+      if (!Number.isFinite(hourly)) return formatting.emptyValue;
+      const annual = hourly * wage.hoursPerYear;
+      return `<div>${formatAnnual(annual)}+</div><div class="hourly-col">${formatHourly(hourly)}</div>`;
+    });
+    const levelRows = levels.keys.map((k, idx) => {
+      const levelNumber = idx + 1;
+      const salaryRange = salaryFloors[idx];
+      const rowChance = lotteryOn ? lottery.selectionByLevel[levelNumber] : null;
+      const chanceCell =
+        lotteryOn && rowChance !== null
+          ? `<td class="chance-col">${Number.isFinite(rowChance) ? `${rowChance}%` : formatting.emptyValue}</td>`
+          : "";
+      return `<tr class="${currentLevel === levelNumber ? "is-active-row" : ""}"><td class="level-col">${levels.labels.tableLevelPrefix} ${k}</td><td class="salary-col">${salaryRange}</td>${chanceCell}</tr>`;
+    }).join("");
+    const selectionLine =
+      lotteryOn && chance
+        ? `${lottery.selectionLineTemplate.replace("{{chance}}", chance)} <span class="selection-note">${lottery.disclaimer}</span>`
+        : "";
+    const point = lngLat || getFeatureCenter(feature);
+    if (!point) return;
+    activePopupRef.current?.remove();
+    const popup = new maplibregl.Popup({
+      offset: mapConfig.popupOffset,
+      focusAfterOpen: false,
+      className: "county-popup",
+      maxWidth: "min(360px, calc(100vw - 24px))",
+    })
+      .setLngLat(point)
+      .setHTML(`<div class="county-popup-content"><div class="popup-top"><div><div class="popup-title">${featureLabel(feature)}, ${STATE_ABBR_TO_NAME[state] || state}</div></div><span class="level-badge ${levelClass}"><span class="level-dot" style="background:${levelColor};"></span><span class="level-badge-text">${levelLabel}</span></span></div>${selectionLine ? `<div class="selection-line">${selectionLine}</div>` : ""}<div class="level-table-wrapper"><table class="level-table" role="table"><thead><tr><th>${levels.labels.tableHeaders.level}</th><th>${levels.labels.tableHeaders.salary}</th>${lotteryOn ? `<th>${levels.labels.tableHeaders.probability}</th>` : ""}</tr></thead><tbody>${levelRows}</tbody></table></div></div>`)
+      .addTo(mapRef.current);
+    activeFeatureRef.current = { geoid: feature.properties.GEOID, point };
+    activePopupRef.current = popup;
+  }
+
+  function zoomToState(stateAbbr) {
+    if (!countiesRef.current) return;
+    let bounds = null;
+    countiesRef.current.features.filter((f) => featureState(f) === stateAbbr).forEach((f) => {
+      bounds = mergeBounds(bounds, getBoundsFromGeometry(f.geometry));
+    });
+    if (bounds) fitToBounds(bounds);
+  }
+
+  function zoomToCounty(geoid) {
+    const feature = countyFeatureMapRef.current[geoid];
+    if (!feature) return;
+    const bounds = getBoundsFromGeometry(feature.geometry);
+    if (bounds) fitToBounds(bounds, { maxZoom: mapConfig.maxCountyZoom });
+    return feature;
+  }
+
+  function handleStateChange(nextState) {
+    setSelectedState(nextState);
+    setSelectedCounty("");
+    setCountyOptions(countiesByStateRef.current[nextState] ?? []);
+    clearActivePopup();
+    if (!nextState) fitToBounds(mapConfig.bounds);
+    else zoomToState(nextState);
+  }
+
+  function handleCountyChange(nextCounty) {
+    setSelectedCounty(nextCounty);
+    if (nextCounty) {
+      const feature = zoomToCounty(nextCounty);
+      showCountyPopup(feature);
+    } else {
+      clearActivePopup();
+    }
+  }
+
+  function handleSocSelect(code, display) {
+    setSoc(code);
+    setSocText(display);
+    updateLevels(code, salary);
+  }
+
+  function handleSalaryChange(nextValue) {
+    const raw = parseCurrency(nextValue);
+    if (Number.isNaN(raw)) return;
+    setSalary(raw);
+    updateLevels(soc, raw);
+  }
+
+  function handleSalaryClear() {
+    setSalary("");
+    updateLevels(soc, Number.NaN);
+  }
+
+  useEffect(() => {
+    lotteryEnabledRef.current = lotteryEnabled;
+    const active = activeFeatureRef.current;
+    if (!active) return;
+    const updatedFeature = countyFeatureMapRef.current[active.geoid];
+    if (updatedFeature) showCountyPopup(updatedFeature, active.point);
+  }, [lotteryEnabled]);
+
+  useEffect(() => {
+    const { soc: initialSoc, socParam, socText: initialText } = initialQueryRef.current;
+    if (!socParam) return undefined;
+    let cancelled = false;
+    fetch(data.socCodesUrl).then((r) => r.json()).then((options) => {
+      if (cancelled) return;
+      const resolved = resolveSoc(socParam, options);
+      if (!resolved) return;
+      setSoc((current) => current === initialSoc || current === resolved.parent ? resolved.parent : current);
+      setSocText((current) => current === initialText || current === socParam ? resolved.display : current);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!locationsReady || initialLocationAppliedRef.current) return;
+    const { state, county } = initialQueryRef.current;
+    let targetState = state;
+    let targetCounty = county;
+    if (!targetState && targetCounty) {
+      const feature = countyFeatureMapRef.current[targetCounty];
+      if (feature) targetState = featureState(feature);
+    }
+    if (targetState) handleStateChange(targetState);
+    if (targetCounty) handleCountyChange(targetCounty);
+    initialLocationAppliedRef.current = true;
+  }, [locationsReady]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (selectedState) params.set(query.keys.state, selectedState);
+    else params.delete(query.keys.state);
+    if (selectedCounty) params.set(query.keys.county, selectedCounty);
+    else params.delete(query.keys.county);
+    if (soc) params.set(query.keys.soc, soc);
+    else params.delete(query.keys.soc);
+    if (salary !== "" && Number.isFinite(Number(salary))) params.set(query.keys.salary, String(Number(salary)));
+    else params.delete(query.keys.salary);
+    if (lotteryEnabled) params.set(query.keys.h1b, "1");
+    else params.delete(query.keys.h1b);
+    const nextQuery = params.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [selectedState, selectedCounty, soc, salary, lotteryEnabled]);
+
+  const occupationDisplay = socText || formatting.emptyValue;
+  const salaryDisplay =
+    salary === "" || Number.isNaN(Number(salary))
+      ? formatting.emptyValue
+      : `${formatting.currencySymbol}${formatCurrency(Number(salary))}${formatting.annualSuffix}`;
+
+  return (
+    <>
+      <ControlPanel
+        collapsed={collapsed}
+        onToggleCollapse={() => setCollapsed((v) => !v)}
+        stateOptions={stateOptions}
+        countyOptions={countyOptions}
+        selectedState={selectedState}
+        selectedCounty={selectedCounty}
+        onStateChange={handleStateChange}
+        onCountyChange={handleCountyChange}
+        socText={socText}
+        onSocSelect={handleSocSelect}
+        salary={salary}
+        onSalaryChange={handleSalaryChange}
+        onClearSalary={handleSalaryClear}
+        occupationDisplay={occupationDisplay}
+        salaryDisplay={salaryDisplay}
+        handleShare={handleShare}
+        lotteryEnabled={lotteryEnabled}
+        onToggleLottery={() => setLotteryEnabled((v) => !v)}
+        wagesLoading={wagesLoading}
+      />
+      <div id="map" />
+    </>
+  );
+}
