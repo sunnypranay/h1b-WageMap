@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>WageMap — 2027–2028 Prevailing Wages by County</title>
+    <meta name="description"
+        content="WageMap is a free U.S. county map of 2027–2028 OFLC prevailing wages. Search a SOC occupation, enter a salary, and see wage levels I–IV plus estimated H-1B lottery chances." />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="author" content="Based on WageMap by Venu Vardhan Reddy Tekula (vchrombie)" />
+    <meta name="application-name" content="WageMap" />
+    <meta name="apple-mobile-web-app-title" content="WageMap" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#3D5A80" />
+    <meta name="keywords"
+        content="WageMap, prevailing wage map, OFLC prevailing wage 2026-27, 2027-2028 prevailing wage, county wage levels, SOC wage, H-1B prevailing wage, H-1B lottery, DOL wage search, Level I Level II Level III Level IV" />
+
+    <meta property="og:site_name" content="WageMap" />
+    <meta property="og:title" content="WageMap — 2027–2028 Prevailing Wages by County" />
+    <meta property="og:description"
+        content="Free county-level map of OFLC prevailing wages and estimated H-1B lottery odds for 2027–2028." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="/preview.png" />
+    <meta property="og:image:alt" content="WageMap county prevailing wage map of the United States" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WageMap — 2027–2028 Prevailing Wages by County" />
+    <meta name="twitter:description"
+        content="Search an occupation, enter a salary, and see OFLC wage levels by U.S. county." />
+    <meta name="twitter:image" content="/preview.png" />
+
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <noscript>
+        <main>
+            <h1>WageMap</h1>
+            <p>
+                Interactive U.S. county map of 2027–2028 OFLC prevailing wages by
+                occupation (SOC) and wage level I–IV, with estimated H-1B lottery
+                chances. JavaScript is required to use the map.
+            </p>
+            <p>
+                WageMap is based on the original
+                <a href="https://github.com/vchrombie/wagemap">WageMap by Venu Vardhan Reddy Tekula (vchrombie)</a>,
+                MIT licensed, rebuilt with OFLC Wage Year 2026–27 data.
+            </p>
+        </main>
+    </noscript>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "WageMap",
+      "alternateName": ["Wage Map", "Prevailing Wage Map"],
+      "description": "Interactive U.S. county-level map of 2027–2028 OFLC prevailing wages by occupation and wage level, with estimated H-1B lottery odds.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript and a modern browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Venu Vardhan Reddy Tekula",
+        "alternateName": "vchrombie",
+        "url": "https://github.com/vchrombie"
+      },
+      "contributor": {
+        "@type": "Person",
+        "name": "Pranay Mandadapu",
+        "url": "https://github.com/sunnypranay"
+      },
+      "isBasedOn": "https://github.com/vchrombie/wagemap",
+      "license": "https://opensource.org/licenses/MIT",
+      "keywords": [
+        "prevailing wage",
+        "OFLC",
+        "H-1B",
+        "SOC",
+        "county wage map",
+        "wage level"
+      ]
+    }
+    </script>
+
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

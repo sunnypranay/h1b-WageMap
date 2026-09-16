@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /data/
+Disallow: /counties.geojson
+
+# After you deploy, add the live origin here, for example:
+# Sitemap: https://your-domain.vercel.app/sitemap.xml

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WageMap disclosures — data sources and privacy</title>
+  <meta name="description" content="WageMap data sources, OFLC wage year 2026–27 notes, H-1B lottery estimates, and privacy disclosures. Based on WageMap by vchrombie." />
+  <meta name="robots" content="index, follow" />
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #111827; line-height: 1.5; }
+    h1 { font-size: 28px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; }
+    th { background: #f9fafb; text-align: left; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Disclosures</h1>
+  <p>WageMap is a static, client-only visualization. No salary or occupation search is sent to a backend we control; calculations run in the browser.</p>
+  <h2>Datasets</h2>
+  <table>
+    <tr><th>Data</th><th>Source</th><th>Notes</th></tr>
+    <tr>
+      <td>Prevailing wage levels I–IV</td>
+      <td>U.S. Department of Labor, OFLC Wage Year 2026–27 ALC export + Geography lookup</td>
+      <td>Hourly floors per SOC, joined to Census county-equivalents (including Connecticut planning regions). Annual OFLC values are converted at 2,080 hours/year. Not a legal prevailing wage determination.</td>
+    </tr>
+    <tr>
+      <td>SOC codes &amp; titles</td>
+      <td>OFLC oes_soc_occs.csv and xwalk_plus.csv (Wage Year 2026–27)</td>
+      <td>Used for occupation autocomplete. Detailed O*NET codes map to parent SOC wage files.</td>
+    </tr>
+    <tr>
+      <td>County boundaries</td>
+      <td>U.S. Census Bureau cartographic boundary file <code>cb_2023_us_county_5m</code></td>
+      <td>Generalized geometry for performance. Includes FIPS codes and NAMELSAD labels.</td>
+    </tr>
+    <tr>
+      <td>Basemap tiles</td>
+      <td>OpenFreeMap Positron style via MapLibre GL</td>
+      <td>Tile requests go from the browser to OpenFreeMap. No Mapbox token is used.</td>
+    </tr>
+    <tr>
+      <td>Lottery probabilities</td>
+      <td>DHS estimates for the wage-weighted H-1B selection rule (Level I 15.29%, II 30.58%, III 45.87%, IV 61.16%)</td>
+      <td>Illustrative only. Shown as 2027–2028 overlay. Replace when USCIS publishes actual selection rates.</td>
+    </tr>
+  </table>
+  <h2>Limitations</h2>
+  <ul>
+    <li>Informational/visualization only — not legal advice and not an official OFLC wage determination.</li>
+    <li>Static datasets lag newer OFLC releases.</li>
+    <li>This project is based on <a href="https://github.com/vchrombie/wagemap">WageMap by Venu Vardhan Reddy Tekula (vchrombie)</a> (MIT), rebuilt with 2026–27 wage data.</li>
+  </ul>
+</body>
+</html>

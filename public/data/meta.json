@@ -1,0 +1,10 @@
+{
+  "wageYear": "2026-27",
+  "source": "OFLC ALC_Export + Geography, Wage Year 2026-27",
+  "hoursPerYear": 2080,
+  "encoding": "hourly cents [L1, L2, L3, L4] aligned to data/geoids.json",
+  "occupations": 846,
+  "counties": 3222,
+  "unmatchedGeographyRows": 0,
+  "countyWageCells": 2689134
+}
