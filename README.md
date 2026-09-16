@@ -2,7 +2,9 @@
 
 Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pranay Mandadapu](https://github.com/sunnypranay)**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
 
-[![h1b-WageMap preview](preview.png)](preview.png)
+**Live site:** [https://h1b-wagemap.vercel.app](https://h1b-wagemap.vercel.app/)
+
+[![h1b-WageMap preview](preview.png)](https://h1b-wagemap.vercel.app/)
 
 ## Features
 
@@ -61,11 +63,9 @@ python3 -m venv .venv
 
 ## Deploy (Vercel Hobby)
 
-Static Vite app. Packed wages keep `public/` around **65 MB**, under the 100 MB upload cap.
+Production: [https://h1b-wagemap.vercel.app](https://h1b-wagemap.vercel.app/)
 
-1. Import `sunnypranay/h1b-WageMap` in Vercel. Framework: Vite. Output: `dist`.
-2. After the `*.vercel.app` URL is live, add the domain in [Google Search Console](https://search.google.com/search-console) and request indexing for `/`.
-3. Set `og:url` / canonical in `index.html` to that origin.
+Static Vite app. Packed wages keep `public/` around **65 MB**, under the 100 MB upload cap. Pushes to `main` on `sunnypranay/h1b-WageMap` deploy automatically.
 
 Hobby bandwidth is **shared** (100 GB/month) across every project on the account.
 
