@@ -2,9 +2,9 @@
 
 Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pranay Mandadapu](https://github.com/sunnypranay)**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
 
-**Live site:** [https://h1b-wagemap.vercel.app](https://h1b-wagemap.vercel.app/)
+**Live site:** <a href="https://h1b-wagemap.vercel.app/" target="_blank" rel="noopener noreferrer">https://h1b-wagemap.vercel.app</a>
 
-[![h1b-WageMap preview](preview.png)](https://h1b-wagemap.vercel.app/)
+<a href="https://h1b-wagemap.vercel.app/" target="_blank" rel="noopener noreferrer"><img src="preview.png" alt="h1b-WageMap preview" /></a>
 
 ## Features
 
@@ -63,7 +63,7 @@ python3 -m venv .venv
 
 ## Deploy (Vercel Hobby)
 
-Production: [https://h1b-wagemap.vercel.app](https://h1b-wagemap.vercel.app/)
+Production: <a href="https://h1b-wagemap.vercel.app/" target="_blank" rel="noopener noreferrer">https://h1b-wagemap.vercel.app</a>
 
 Static Vite app. Packed wages keep `public/` around **65 MB**, under the 100 MB upload cap. Pushes to `main` on `sunnypranay/h1b-WageMap` deploy automatically.
 

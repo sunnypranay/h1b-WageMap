@@ -177,6 +177,8 @@ export const SITE_CONFIG = {
     onet: "https://www.onetonline.org/find/result",
     authorName: "Pranay Mandadapu",
     authorUrl: "https://github.com/sunnypranay",
+    repoUrl: "https://github.com/sunnypranay/h1b-WageMap",
+    repoLabel: "GitHub ↗",
   },
   formatting: {
     locale: "en-US",
