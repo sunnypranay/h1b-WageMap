@@ -230,3 +230,139 @@ export default function Map() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function prepareLocationData(countiesGeojson) {
+    const stateSet = new Set();
+    const byState = {};
+    const featureMap = {};
+
+    countiesGeojson.features.forEach((f) => {
+      const abbr = featureState(f);
+      if (!abbr) return;
+
+      stateSet.add(abbr);
+      featureMap[f.properties.GEOID] = f;
+
+      if (!byState[abbr]) byState[abbr] = [];
+      byState[abbr].push({
+        name: featureLabel(f),
+        geoid: f.properties.GEOID,
+      });
+    });
+
+    Object.values(byState).forEach((list) =>
+      list.sort((a, b) => a.name.localeCompare(b.name))
+    );
+
+    countiesByStateRef.current = byState;
+    countyFeatureMapRef.current = featureMap;
+    setStateOptions(Array.from(stateSet).sort());
+    setLocationsReady(true);
+  }
+
+  function clearActivePopup() {
+    activePopupRef.current?.remove();
+    activePopupRef.current = null;
+    activeFeatureRef.current = null;
+  }
+
+  async function updateLevels(selectedSoc, annualSalary) {
+    if (!mapRef.current || !countiesRef.current) return;
+
+    const annual = Number(annualSalary);
+    if (!Number.isFinite(annual)) {
+      setWagesLoading(false);
+      return;
+    }
+
+    const requestId = ++wageRequestRef.current;
+    setWagesLoading(true);
+    const hourly = annual / wage.hoursPerYear;
+
+    try {
+    if (!geoidsRef.current) {
+      const geoidRes = await fetch(data.geoidsUrl);
+      if (!geoidRes.ok) return;
+      geoidsRef.current = await geoidRes.json();
+    }
+
+    const socRes = await fetch(`${data.socDataPath}/${selectedSoc}.json`);
+    if (!socRes.ok) return;
+
+    const packed = await socRes.json();
+    if (wageRequestRef.current !== requestId) return;
+    const wageTable = {};
+    geoidsRef.current.forEach((geoid, i) => {
+      const decoded = decodeWages(packed[i]);
+      if (decoded) wageTable[geoid] = decoded;
+    });
+
+    const counties = structuredClone(countiesRef.current);
+    wageTableRef.current = wageTable;
+
+    counties.features.forEach((f) => {
+      delete f.properties.level;
+
+      const levelSet = wageTable[f.properties.GEOID];
+      if (!levelSet) return;
+
+      let level = 0;
+      if (levelSet.IV && hourly >= levelSet.IV) level = 4;
+      else if (levelSet.III && hourly >= levelSet.III) level = 3;
+      else if (levelSet.II && hourly >= levelSet.II) level = 2;
+      else if (levelSet.I && hourly >= levelSet.I) level = 1;
+
+      f.properties.level = level;
+    });
+
+    const src = mapRef.current.getSource(mapConfig.sources.counties);
+    if (src) src.setData(counties);
+    countiesRef.current = counties;
+    countyFeatureMapRef.current = Object.fromEntries(
+      counties.features.map((f) => [f.properties.GEOID, f])
+    );
+
+    mapRef.current.setPaintProperty(mapConfig.layers.countyFill, "fill-color", [
+      "case",
+      ["==", ["get", "level"], 4],
+      levels.colors[4],
+      ["==", ["get", "level"], 3],
+      levels.colors[3],
+      ["==", ["get", "level"], 2],
+      levels.colors[2],
+      ["==", ["get", "level"], 1],
+      levels.colors[1],
+      ["==", ["get", "level"], 0],
+      levels.colors[0],
+      mapConfig.paint.noDataFill,
+    ]);
+
+    if (mapRef.current.getLayer(mapConfig.layers.countyNoData)) {
+      mapRef.current.setFilter(mapConfig.layers.countyNoData, [
+        "!",
+        ["has", "level"],
+      ]);
+    }
+
+    const active = activeFeatureRef.current;
+    if (active) {
+      const updatedFeature = countyFeatureMapRef.current[active.geoid];
+      if (updatedFeature) {
+        showCountyPopup(updatedFeature, active.point);
+      } else {
+        clearActivePopup();
+      }
+    }
+    } finally {
+      if (wageRequestRef.current === requestId) setWagesLoading(false);
+    }
+  }
+
+  function fitToBounds(bounds, options = {}) {
+    if (!mapRef.current || !bounds) return;
+    mapRef.current.fitBounds(bounds, {
+      padding: mapConfig.fitBounds.padding,
+      duration: mapConfig.fitBounds.duration,
+      ...options,
+    });
+  }
