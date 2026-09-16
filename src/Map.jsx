@@ -17,6 +17,7 @@ import {
 
 import "./Map.css";
 import { addWageMapLayers } from "./setupMapLayers";
+import { ensurePopupInView } from "./popupPosition";
 
 const {
   defaults,
@@ -429,6 +430,9 @@ export default function Map() {
     });
     activeFeatureRef.current = { geoid: feature.properties.GEOID, point };
     activePopupRef.current = popup;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => ensurePopupInView(mapRef.current, popup));
+    });
   }
 
   function zoomToState(stateAbbr) {
