@@ -33,10 +33,7 @@ function OccupationHelp() {
   }, [open]);
 
   return (
-    <div
-      ref={wrapRef}
-      className={`info-wrapper${open ? " is-open" : ""}`}
-    >
+    <div ref={wrapRef} className={`info-wrapper${open ? " is-open" : ""}`}>
       <button
         type="button"
         className="info-icon"
@@ -44,23 +41,12 @@ function OccupationHelp() {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="16" x2="12" y2="12" />
           <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
       </button>
-
       <div className="info-tooltip" role="tooltip">
         <strong>{ui.occupation.infoTitle}</strong>
         <p>{ui.occupation.infoParagraphs[0]}</p>
@@ -68,9 +54,7 @@ function OccupationHelp() {
         <p>{ui.occupation.infoParagraphs[2]}</p>
         <p>
           Try{" "}
-          <a href={links.onet} target="_blank" rel="noopener noreferrer">
-            {ui.occupation.infoLinkText}
-          </a>{" "}
+          <a href={links.onet} target="_blank" rel="noopener noreferrer">{ui.occupation.infoLinkText}</a>{" "}
           {ui.occupation.infoParagraphs[3]}
         </p>
       </div>
@@ -98,24 +82,18 @@ export default function ControlPanel({
   handleShare,
   lotteryEnabled,
   onToggleLottery,
-  locationIndex,
+  locationIndex = [],
   onLocationPick,
   onRegionJump,
   insights,
-  compareCounties,
+  compareCounties = [],
   onOpenCounty,
   onRemoveCompare,
 }) {
   return (
-    <div
-      className={`control-panel ${collapsed ? "collapsed" : ""}${
-        wagesLoading ? " is-loading" : ""
-      }`}
-    >
+    <div className={`control-panel ${collapsed ? "collapsed" : ""}${wagesLoading ? " is-loading" : ""}`}>
       {wagesLoading && (
-        <div className="panel-loading" role="status" aria-live="polite">
-          Updating map
-        </div>
+        <div className="panel-loading" role="status" aria-live="polite">Updating map</div>
       )}
       <div
         className="title-row"
@@ -125,9 +103,7 @@ export default function ControlPanel({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") onToggleCollapse();
         }}
-        aria-label={
-          collapsed ? ui.panel.expandAriaLabel : ui.panel.collapseAriaLabel
-        }
+        aria-label={collapsed ? ui.panel.expandAriaLabel : ui.panel.collapseAriaLabel}
       >
         <div className="title">
           <img className="app-mark" src={app.markSrc} width="22" height="22" alt="" />
@@ -135,13 +111,9 @@ export default function ControlPanel({
         </div>
         <div className="collapse-icon" title={collapsed ? ui.panel.expandTitle : ui.panel.collapseTitle}>
           {collapsed ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 9l6 6 6-6H6z" />
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 9l6 6 6-6H6z" /></svg>
           ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 15l6-6 6 6H6z" />
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 15l6-6 6 6H6z" /></svg>
           )}
         </div>
       </div>
@@ -178,9 +150,7 @@ export default function ControlPanel({
                   onChange={(e) => onSalaryChange(e.target.value)}
                 />
                 {salary !== "" && (
-                  <button type="button" className="clear-btn" aria-label={ui.salary.clearLabel} onClick={onClearSalary}>
-                    ×
-                  </button>
+                  <button type="button" className="clear-btn" aria-label={ui.salary.clearLabel} onClick={onClearSalary}>×</button>
                 )}
               </div>
             </div>
@@ -193,8 +163,8 @@ export default function ControlPanel({
             </div>
             <LocationSearch index={locationIndex} onPick={onLocationPick} />
             <div className="region-row" aria-label={ui.location.regionsLabel}>
-              {ui.location.regions.map((region) => (
-                <button type="button" key={region.id} className="region-chip" onClick={() => onRegionJump(region.id)}>
+              {(ui.location.regions || []).map((region) => (
+                <button type="button" key={region.id} className="region-chip" onClick={() => onRegionJump?.(region.id)}>
                   {region.label}
                 </button>
               ))}
@@ -255,7 +225,7 @@ export default function ControlPanel({
                   <ul className="insight-list">
                     {(insights.highLevel || []).map((row) => (
                       <li key={`high-${row.geoid}`}>
-                        <button type="button" onClick={() => onOpenCounty(row.geoid)}>
+                        <button type="button" onClick={() => onOpenCounty?.(row.geoid)}>
                           <span>{row.name}, {row.state}</span>
                           <span className="insight-meta">L{levels.keys[row.level - 1]}</span>
                         </button>
@@ -268,7 +238,7 @@ export default function ControlPanel({
                   <ul className="insight-list">
                     {(insights.cheapestLevelII || []).map((row) => (
                       <li key={`cheap-${row.geoid}`}>
-                        <button type="button" onClick={() => onOpenCounty(row.geoid)}>
+                        <button type="button" onClick={() => onOpenCounty?.(row.geoid)}>
                           <span>{row.name}, {row.state}</span>
                           <span className="insight-meta">{formatAnnual(row.levelIIAnnual)} L2</span>
                         </button>
@@ -296,8 +266,8 @@ export default function ControlPanel({
                       <th>Level</th>
                       {compareCounties.map((county) => (
                         <th key={county.geoid}>
-                          <button type="button" className="compare-head" onClick={() => onOpenCounty(county.geoid)}>{county.name}</button>
-                          <button type="button" className="compare-remove" aria-label={ui.compare.removeLabel} onClick={() => onRemoveCompare(county.geoid)}>×</button>
+                          <button type="button" className="compare-head" onClick={() => onOpenCounty?.(county.geoid)}>{county.name}</button>
+                          <button type="button" className="compare-remove" aria-label={ui.compare.removeLabel} onClick={() => onRemoveCompare?.(county.geoid)}>×</button>
                         </th>
                       ))}
                     </tr>
