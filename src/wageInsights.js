@@ -1,6 +1,7 @@
 import { SITE_CONFIG } from "./siteConfig";
 
 const { levels, wage } = SITE_CONFIG;
+const NON_CONUS = new Set(["AK", "HI", "PR"]);
 
 export function wageSignature(levelInfo) {
   if (!levelInfo) return "";
@@ -8,6 +9,11 @@ export function wageSignature(levelInfo) {
     const value = levelInfo[key];
     return Number.isFinite(value) ? Math.round(value * 100) : "x";
   }).join("|");
+}
+
+export function formatLevelShort(levelNumber) {
+  const key = levels.keys[levelNumber - 1];
+  return key ? `L ${key}` : SITE_CONFIG.formatting.emptyValue;
 }
 
 export function nextLevelGap(levelInfo, annual, hoursPerYear = wage.hoursPerYear) {
@@ -74,7 +80,9 @@ function countyRecord(feature, wageTable, annual, hoursPerYear, labelFn, stateFn
   };
 }
 
-export function buildCountyLists(features, wageTable, annual, hoursPerYear, labelFn, stateFn, limit = 8) {
+export function buildCountyLists(features, wageTable, annual, hoursPerYear, labelFn, stateFn, options = {}) {
+  const limit = options.limit ?? 8;
+  const scope = options.scope || "CONUS";
   if (!Array.isArray(features) || !wageTable || !Number.isFinite(annual)) {
     return { highLevel: [], cheapestLevelII: [] };
   }
@@ -82,7 +90,9 @@ export function buildCountyLists(features, wageTable, annual, hoursPerYear, labe
   const rows = [];
   features.forEach((feature) => {
     const row = countyRecord(feature, wageTable, annual, hoursPerYear, labelFn, stateFn);
-    if (row) rows.push(row);
+    if (!row) return;
+    if (scope === "CONUS" && NON_CONUS.has(row.state)) return;
+    rows.push(row);
   });
 
   const highLevel = rows
@@ -96,4 +106,25 @@ export function buildCountyLists(features, wageTable, annual, hoursPerYear, labe
     .slice(0, limit);
 
   return { highLevel, cheapestLevelII };
+}
+
+export function floorBreaks(wageTable, levelKey, hoursPerYear) {
+  const values = [];
+  Object.values(wageTable || {}).forEach((wages) => {
+    const hourly = wages?.[levelKey];
+    if (Number.isFinite(hourly)) values.push(hourly * hoursPerYear);
+  });
+  values.sort((a, b) => a - b);
+  if (values.length < 5) return [];
+  const at = (p) => values[Math.min(values.length - 1, Math.floor(p * (values.length - 1)))];
+  return [at(0.2), at(0.4), at(0.6), at(0.8)];
+}
+
+export function floorBand(annual, breaks) {
+  if (!Number.isFinite(annual) || !breaks?.length) return 0;
+  if (annual <= breaks[0]) return 1;
+  if (annual <= breaks[1]) return 2;
+  if (annual <= breaks[2]) return 3;
+  if (annual <= breaks[3]) return 4;
+  return 5;
 }

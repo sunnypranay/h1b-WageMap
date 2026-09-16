@@ -2,7 +2,7 @@
   "name": "h1b-wagemap",
   "private": true,
   "version": "2026.27.0",
-  "description": "h1b-WageMap — interactive U.S. county map of 2027–2028 OFLC prevailing wages, by Pranay Mandadapu.",
+  "description": "h1b-WageMap — interactive U.S. county map of FY 2028 OFLC prevailing wages, by Pranay Mandadapu.",
   "homepage": "https://github.com/sunnypranay/h1b-WageMap",
   "bugs": {
     "url": "https://github.com/sunnypranay/h1b-WageMap/issues"
