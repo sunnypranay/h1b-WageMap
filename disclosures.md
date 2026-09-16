@@ -1,6 +1,6 @@
 # Disclosures
 
-WageMap is a static, client-only visualization. No application data is sent to a backend that we control; all computations run in the browser.
+h1b-WageMap is a static, client-only visualization by Pranay Mandadapu. No application data is sent to a backend that we control; all computations run in the browser.
 
 ## Datasets
 
@@ -22,4 +22,4 @@ WageMap is a static, client-only visualization. No application data is sent to a
 
 - Wage and lottery data are for informational/visualization purposes only and should not be treated as legal advice or an official prevailing wage determination.
 - Static datasets may become outdated; rebuild data when OFLC publishes new releases or when USCIS announces updated H-1B selection rates.
-- This project is based on [WageMap by Venu Vardhan Reddy Tekula (vchrombie)](https://github.com/vchrombie/wagemap) (MIT).
+- Created by [Pranay Mandadapu](https://github.com/sunnypranay). MIT licensed — see [`LICENSE`](LICENSE).

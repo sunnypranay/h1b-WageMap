@@ -1,20 +1,17 @@
 {
-  "name": "wagemap",
+  "name": "h1b-wagemap",
   "private": true,
   "version": "2026.27.0",
-  "description": "WageMap — interactive U.S. county map of 2027–2028 OFLC prevailing wages. Based on vchrombie/wagemap.",
-  "homepage": "https://github.com/sunnypranay/wagemap",
+  "description": "h1b-WageMap — interactive U.S. county map of 2027–2028 OFLC prevailing wages, by Pranay Mandadapu.",
+  "homepage": "https://github.com/sunnypranay/h1b-WageMap",
   "bugs": {
-    "url": "https://github.com/sunnypranay/wagemap/issues"
+    "url": "https://github.com/sunnypranay/h1b-WageMap/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sunnypranay/wagemap.git"
+    "url": "git+https://github.com/sunnypranay/h1b-WageMap.git"
   },
   "author": "Pranay Mandadapu (https://github.com/sunnypranay)",
-  "contributors": [
-    "Venu Vardhan Reddy Tekula (https://github.com/vchrombie)"
-  ],
   "license": "MIT",
   "type": "module",
   "scripts": {

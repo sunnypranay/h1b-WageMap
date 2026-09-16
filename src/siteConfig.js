@@ -2,13 +2,13 @@ const COUNTY_SUFFIX = " County";
 
 export const SITE_CONFIG = {
   app: {
-    name: "WageMap",
+    name: "h1b-WageMap",
     subtitle:
       "2027–2028 prevailing wages. Select a state or county, occupation, and salary.",
   },
   share: {
-    title: "WageMap",
-    text: "Check 2027–2028 prevailing wage levels by U.S. county",
+    title: "h1b-WageMap",
+    text: "Check 2027–2028 H-1B prevailing wage levels by U.S. county",
     copiedMessage: "Link copied to clipboard",
   },
   data: {
@@ -172,11 +172,8 @@ export const SITE_CONFIG = {
     oflc: "https://flag.dol.gov/wage-data/wage-search",
     oflcLabel: "OFLC Wage Data ↗",
     onet: "https://www.onetonline.org/find/result",
-    originalUrl: "https://github.com/vchrombie/wagemap",
-    originalHandle: "@vchrombie",
-    originalAuthor: "Venu Vardhan Reddy Tekula",
-    creditPrefix: "Based on",
-    creditSuffix: "· original by Venu Vardhan Reddy Tekula",
+    authorName: "Pranay Mandadapu",
+    authorUrl: "https://github.com/sunnypranay",
   },
   formatting: {
     locale: "en-US",

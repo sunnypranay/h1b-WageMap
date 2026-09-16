@@ -1,10 +1,8 @@
-# WageMap
+# h1b-WageMap
 
-Interactive U.S. county map of **2027–2028 prevailing wages**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
+Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pranay Mandadapu](https://github.com/sunnypranay)**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
 
-[![WageMap preview](preview.png)](preview.png)
-
-**This is a fork.** The original app is [WageMap](https://github.com/vchrombie/wagemap) by **[Venu Vardhan Reddy Tekula](https://github.com/vchrombie)** (`@vchrombie`). This copy keeps that MIT-licensed work, swaps in OFLC Wage Year **2026–27** data (used for FY **2027–2028** filings), and uses MapLibre + OpenFreeMap so no Mapbox token is required.
+[![h1b-WageMap preview](preview.png)](preview.png)
 
 ## Features
 
@@ -65,23 +63,18 @@ python3 -m venv .venv
 
 Static Vite app. Packed wages keep `public/` around **65 MB**, under the 100 MB upload cap.
 
-1. Push this repo to GitHub (this fork: `sunnypranay/wagemap`).
-2. Vercel → Add Project → import the repo. Framework: Vite. Output: `dist`.
-3. After the `*.vercel.app` URL is live, point Google at it:
+1. Import `sunnypranay/h1b-WageMap` in Vercel. Framework: Vite. Output: `dist`.
+2. After the `*.vercel.app` URL is live, add the domain in [Google Search Console](https://search.google.com/search-console) and request indexing for `/`.
+3. Set `og:url` / canonical in `index.html` to that origin.
 
-   - In Search Console, add the Vercel domain and request indexing for `/`.
-   - Put the live origin in `public/robots.txt` as `Sitemap: https://YOUR-DOMAIN/sitemap.xml` if you add a sitemap.
-   - Set `og:url` / canonical in `index.html` to that origin so shares and search results use the real site.
+Hobby bandwidth is **shared** (100 GB/month) across every project on the account.
 
-Hobby allows many projects; **bandwidth is shared** (100 GB/month). If that cap is hit, every Hobby app on the account pauses until the next month.
+## Author
 
-## Credits
-
-- **Original application:** [Venu Vardhan Reddy Tekula (`@vchrombie`)](https://github.com/vchrombie) — [vchrombie/wagemap](https://github.com/vchrombie/wagemap)
-- **This fork (2026–27 data, MapLibre, UI):** [Pranay Mandadapu (`@sunnypranay`)](https://github.com/sunnypranay)
+[Pranay Mandadapu](https://github.com/sunnypranay)
 
 Wage data is published by the U.S. Department of Labor, OFLC. Census geography is from the U.S. Census Bureau. Lottery percentages are DHS estimates, not USCIS selection results.
 
 ## License
 
-MIT. Original copyright [Venu Vardhan Reddy Tekula](https://github.com/vchrombie); see [`LICENSE`](LICENSE).
+MIT — see [`LICENSE`](LICENSE).

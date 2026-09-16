@@ -350,11 +350,9 @@ export default function ControlPanel({
           </div>
 
           <div className="credit">
-            {links.creditPrefix}{" "}
-            <a href={links.originalUrl} target="_blank" rel="noopener noreferrer">
-              <strong>{links.originalHandle}/wagemap</strong>
-            </a>{" "}
-            {links.creditSuffix}
+            <a href={links.authorUrl} target="_blank" rel="noopener noreferrer">
+              {links.authorName}
+            </a>
           </div>
         </>
       )}
