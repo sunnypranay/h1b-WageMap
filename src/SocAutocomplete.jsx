@@ -72,7 +72,7 @@ export default function SocAutocomplete({ value, onSelect, autoFocus = false }) 
         placeholder={ui.occupation.placeholder}
         onFocus={(e) => {
           e.target.select();
-          setOpen(true);
+          if (!value || query.trim() !== String(value).trim()) setOpen(true);
         }}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -94,14 +94,9 @@ export default function SocAutocomplete({ value, onSelect, autoFocus = false }) 
           ×
         </button>
       )}
-      {open && (
+      {open && searching && (
         <div className="soc-menu" style={autocomplete.menuStyle}>
-          {!searching && (
-            <div className="soc-option soc-option-hint">
-              Type any part of a job title or SOC code
-            </div>
-          )}
-          {searching && filtered.length === 0 && (
+          {filtered.length === 0 && (
             <div className="soc-option soc-option-hint">
               No matches. Try “software”, “nurse”, or a SOC like 15-1252.
             </div>
