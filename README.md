@@ -10,9 +10,12 @@ Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pra
 
 - Occupation search (any part of a title or SOC, default **15-1252.00 – Software Developers**)
 - Annual salary → county colors for Levels I–IV, below Level I, and no data
-- Full state names, full dollar amounts, and hourly rates in the county popup
+- City / county search plus Lower 48, Alaska, Hawaii, and Puerto Rico jumps
+- County popup: annual + hourly floors, gap to the next wage level, and other counties in the same OFLC wage area
+- Ranked lists: Level III+ counties at this salary, and cheapest Level II+ counties
+- Pin two counties to compare Level I–IV floors
 - Optional DHS-estimated H-1B wage-weighted lottery overlay (not official 2027–2028 rates)
-- Shareable URL (state, county, SOC, salary, lottery toggle)
+- Shareable URL (state, county, SOC, salary, lottery toggle, compare pins)
 - Works on phones: collapsed panel, 16px inputs, tap-to-open help
 
 ## Quick start
@@ -36,9 +39,10 @@ npm run preview
 
 1. Search an occupation (or keep Software Developers).
 2. Enter annual base salary.
-3. Tap a county — or pick a state/county to zoom.
-4. Toggle H-1B lottery for estimated selection chances by wage level.
-5. Share copies the current view as a link.
+3. Search a city or county, jump to Alaska / Hawaii / Puerto Rico, or tap the map.
+4. Use the popup to see the gap to the next level and pin two counties to compare.
+5. Toggle H-1B lottery for estimated selection chances by wage level.
+6. Share copies the current view as a link.
 
 ## Data
 
