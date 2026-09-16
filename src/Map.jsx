@@ -393,7 +393,7 @@ export default function Map() {
       const hourly = levelInfo?.[k];
       if (!Number.isFinite(hourly)) return formatting.emptyValue;
       const annual = hourly * wage.hoursPerYear;
-      return `<div>${formatAnnual(annual)}+</div><div class="hourly-col">${formatHourly(hourly)}</div>`;
+      return `<div>${formatAnnual(annual)}+</div><div class=\"hourly-col\">${formatHourly(hourly)}</div>`;
     });
     const levelRows = levels.keys.map((k, idx) => {
       const levelNumber = idx + 1;
@@ -401,13 +401,13 @@ export default function Map() {
       const rowChance = lotteryOn ? lottery.selectionByLevel[levelNumber] : null;
       const chanceCell =
         lotteryOn && rowChance !== null
-          ? `<td class="chance-col">${Number.isFinite(rowChance) ? `${rowChance}%` : formatting.emptyValue}</td>`
+          ? `<td class=\"chance-col\">${Number.isFinite(rowChance) ? `${rowChance}%` : formatting.emptyValue}</td>`
           : "";
-      return `<tr class="${currentLevel === levelNumber ? "is-active-row" : ""}"><td class="level-col">${levels.labels.tableLevelPrefix} ${k}</td><td class="salary-col">${salaryRange}</td>${chanceCell}</tr>`;
+      return `<tr class=\"${currentLevel === levelNumber ? "is-active-row" : ""}\"><td class=\"level-col\">${levels.labels.tableLevelPrefix} ${k}</td><td class=\"salary-col\">${salaryRange}</td>${chanceCell}</tr>`;
     }).join("");
     const selectionLine =
       lotteryOn && chance
-        ? `${lottery.selectionLineTemplate.replace("{{chance}}", chance)} <span class="selection-note">${lottery.disclaimer}</span>`
+        ? `${lottery.selectionLineTemplate.replace("{{chance}}", chance)} <span class=\"selection-note\">${lottery.disclaimer}</span>`
         : "";
     const point = lngLat || getFeatureCenter(feature);
     if (!point) return;
@@ -415,12 +415,18 @@ export default function Map() {
     const popup = new maplibregl.Popup({
       offset: mapConfig.popupOffset,
       focusAfterOpen: false,
+      closeButton: false,
       className: "county-popup",
       maxWidth: "min(360px, calc(100vw - 24px))",
     })
       .setLngLat(point)
-      .setHTML(`<div class="county-popup-content"><div class="popup-top"><div><div class="popup-title">${featureLabel(feature)}, ${STATE_ABBR_TO_NAME[state] || state}</div></div><span class="level-badge ${levelClass}"><span class="level-dot" style="background:${levelColor};"></span><span class="level-badge-text">${levelLabel}</span></span></div>${selectionLine ? `<div class="selection-line">${selectionLine}</div>` : ""}<div class="level-table-wrapper"><table class="level-table" role="table"><thead><tr><th>${levels.labels.tableHeaders.level}</th><th>${levels.labels.tableHeaders.salary}</th>${lotteryOn ? `<th>${levels.labels.tableHeaders.probability}</th>` : ""}</tr></thead><tbody>${levelRows}</tbody></table></div></div>`)
+      .setHTML(`<div class=\"county-popup-content\"><div class=\"popup-top\"><div><div class=\"popup-title\">${featureLabel(feature)}, ${STATE_ABBR_TO_NAME[state] || state}</div></div><div class=\"popup-top-actions\"><span class=\"level-badge ${levelClass}\"><span class=\"level-dot\" style=\"background:${levelColor};\"></span><span class=\"level-badge-text\">${levelLabel}</span></span><button type=\"button\" class=\"popup-close\" aria-label=\"Close\">×</button></div></div>${selectionLine ? `<div class=\"selection-line\">${selectionLine}</div>` : ""}<div class=\"level-table-wrapper\"><table class=\"level-table\" role=\"table\"><thead><tr><th>${levels.labels.tableHeaders.level}</th><th>${levels.labels.tableHeaders.salary}</th>${lotteryOn ? `<th>${levels.labels.tableHeaders.probability}</th>` : ""}</tr></thead><tbody>${levelRows}</tbody></table></div></div>`)
       .addTo(mapRef.current);
+    popup.getElement()?.querySelector(".popup-close")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      clearActivePopup();
+    });
     activeFeatureRef.current = { geoid: feature.properties.GEOID, point };
     activePopupRef.current = popup;
   }
