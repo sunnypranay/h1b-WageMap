@@ -138,6 +138,8 @@ export default function Map() {
   const [lotteryEnabled, setLotteryEnabled] = useState(
     initialQueryRef.current.lotteryEnabled
   );
+  const [wagesLoading, setWagesLoading] = useState(true);
+  const wageRequestRef = useRef(0);
 
   function handleShare() {
     const url = window.location.href;
@@ -303,10 +305,16 @@ export default function Map() {
     if (!mapRef.current || !countiesRef.current) return;
 
     const annual = Number(annualSalary);
-    if (!Number.isFinite(annual)) return;
+    if (!Number.isFinite(annual)) {
+      setWagesLoading(false);
+      return;
+    }
 
+    const requestId = ++wageRequestRef.current;
+    setWagesLoading(true);
     const hourly = annual / wage.hoursPerYear;
 
+    try {
     if (!geoidsRef.current) {
       const geoidRes = await fetch(data.geoidsUrl);
       if (!geoidRes.ok) return;
@@ -317,6 +325,7 @@ export default function Map() {
     if (!socRes.ok) return;
 
     const packed = await socRes.json();
+    if (wageRequestRef.current !== requestId) return;
     const wageTable = {};
     geoidsRef.current.forEach((geoid, i) => {
       const decoded = decodeWages(packed[i]);
@@ -378,6 +387,9 @@ export default function Map() {
       } else {
         clearActivePopup();
       }
+    }
+    } finally {
+      if (wageRequestRef.current === requestId) setWagesLoading(false);
     }
   }
 
@@ -700,6 +712,7 @@ export default function Map() {
         handleShare={handleShare}
         lotteryEnabled={lotteryEnabled}
         onToggleLottery={() => setLotteryEnabled((v) => !v)}
+        wagesLoading={wagesLoading}
       />
 
       <div id="map" />

@@ -3,8 +3,11 @@ const COUNTY_SUFFIX = " County";
 export const SITE_CONFIG = {
   app: {
     name: "h1b-WageMap",
+    markSrc: "/favicon.svg",
+    siteUrl: "https://h1b-wagemap.vercel.app",
     subtitle:
       "2027–2028 prevailing wages. Select a state or county, occupation, and salary.",
+    yearNote: "OFLC Wage Year 2026–27 · used for FY 2027–2028 filings",
   },
   share: {
     title: "h1b-WageMap",

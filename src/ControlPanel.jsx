@@ -79,6 +79,7 @@ function OccupationHelp() {
 
 export default function ControlPanel({
   collapsed,
+  wagesLoading,
   onToggleCollapse,
   stateOptions,
   countyOptions,
@@ -98,7 +99,16 @@ export default function ControlPanel({
   onToggleLottery,
 }) {
   return (
-    <div className={`control-panel ${collapsed ? "collapsed" : ""}`}>
+    <div
+      className={`control-panel ${collapsed ? "collapsed" : ""}${
+        wagesLoading ? " is-loading" : ""
+      }`}
+    >
+      {wagesLoading && (
+        <div className="panel-loading" role="status" aria-live="polite">
+          Updating map
+        </div>
+      )}
       {/* Title Row (clickable) */}
       <div
         className="title-row"
@@ -112,7 +122,16 @@ export default function ControlPanel({
           collapsed ? ui.panel.expandAriaLabel : ui.panel.collapseAriaLabel
         }
       >
-        <div className="title">{app.name}</div>
+        <div className="title">
+          <img
+            className="app-mark"
+            src={app.markSrc}
+            width="22"
+            height="22"
+            alt=""
+          />
+          {app.name}
+        </div>
         <div
           className="collapse-icon"
           title={collapsed ? ui.panel.expandTitle : ui.panel.collapseTitle}
@@ -133,6 +152,7 @@ export default function ControlPanel({
       {!collapsed && (
         <>
           <div className="subtitle">{app.subtitle}</div>
+          <div className="year-note">{app.yearNote}</div>
 
           <div className="section panel-card">
             <div className="label-row">

@@ -147,3 +147,4 @@ raw/*.zip
 .DS_Store
 .idea/
 .vscode/
+.vercel
