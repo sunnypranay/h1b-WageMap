@@ -40,6 +40,7 @@ export function addWageMapLayers(map, counties, mapConfig) {
   map.addSource(mapConfig.sources.counties, {
     type: "geojson",
     data: counties,
+    promoteId: "GEOID",
   });
 
   const beforeId = firstExistingLayerId(map, mapConfig.insertBeforeLayerIds);
@@ -81,6 +82,26 @@ export function addWageMapLayers(map, counties, mapConfig) {
         "line-color": mapConfig.paint.countyOutline.color,
         "line-width": mapConfig.paint.countyOutline.width,
         "line-opacity": mapConfig.paint.countyOutline.opacity,
+      },
+      layout: { "line-join": "round" },
+    },
+    beforeId
+  );
+
+  map.addLayer(
+    {
+      id: mapConfig.layers.countySelected,
+      type: "line",
+      source: mapConfig.sources.counties,
+      paint: {
+        "line-color": mapConfig.paint.selectedOutline.color,
+        "line-width": mapConfig.paint.selectedOutline.width,
+        "line-opacity": [
+          "case",
+          ["boolean", ["feature-state", "picked"], false],
+          mapConfig.paint.selectedOutline.opacity,
+          0,
+        ],
       },
       layout: { "line-join": "round" },
     },
