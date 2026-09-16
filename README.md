@@ -1,6 +1,6 @@
 # h1b-WageMap
 
-Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pranay Mandadapu](https://github.com/sunnypranay)**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
+Interactive U.S. county map of **FY 2028 prevailing wages**, built by **[Pranay Mandadapu](https://github.com/sunnypranay)**. Search an occupation, enter a salary, and see which OFLC wage level (I–IV) applies in each county. Optionally overlay estimated H-1B lottery chances.
 
 **Live site:** <a href="https://h1b-wagemap.vercel.app/" target="_blank" rel="noopener noreferrer">https://h1b-wagemap.vercel.app</a>
 
@@ -12,9 +12,11 @@ Interactive U.S. county map of **2027–2028 prevailing wages**, built by **[Pra
 - Annual salary → county colors for Levels I–IV, below Level I, and no data
 - City / county search plus Lower 48, Alaska, Hawaii, and Puerto Rico jumps
 - County popup: annual + hourly floors, gap to the next wage level, and other counties in the same OFLC wage area
-- Ranked lists: Level III+ counties at this salary, and cheapest Level II+ counties
+- Ranked lists default to the Lower 48 (optional AK / HI / PR)
+- Target-level mode: color counties by the salary needed to reach Level I–IV
+- Share generates a PNG card plus the current URL
 - Pin two counties to compare Level I–IV floors
-- Optional DHS-estimated H-1B wage-weighted lottery overlay (not official 2027–2028 rates)
+- Optional DHS-estimated H-1B wage-weighted lottery overlay (not official FY 2028 rates)
 - Shareable URL (state, county, SOC, salary, lottery toggle, compare pins)
 - Works on phones: collapsed panel, 16px inputs, tap-to-open help
 
