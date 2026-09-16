@@ -7,23 +7,22 @@ import { formatAnnual, formatCurrency } from "./mapUtils";
 
 const { app, formatting, levels, links, lottery, ui } = SITE_CONFIG;
 
+function isMobileSheet() {
+  return typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches;
+}
+
 function OccupationHelp() {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
-
     function onPointerDown(event) {
-      if (wrapRef.current && !wrapRef.current.contains(event.target)) {
-        setOpen(false);
-      }
+      if (wrapRef.current && !wrapRef.current.contains(event.target)) setOpen(false);
     }
-
     function onKeyDown(event) {
       if (event.key === "Escape") setOpen(false);
     }
-
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -34,13 +33,7 @@ function OccupationHelp() {
 
   return (
     <div ref={wrapRef} className={`info-wrapper${open ? " is-open" : ""}`}>
-      <button
-        type="button"
-        className="info-icon"
-        aria-label={ui.occupation.helpLabel}
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
+      <button type="button" className="info-icon" aria-label={ui.occupation.helpLabel} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="16" x2="12" y2="12" />
@@ -90,32 +83,45 @@ export default function ControlPanel({
   onOpenCounty,
   onRemoveCompare,
 }) {
+  function minimizeIfMobile() {
+    if (!collapsed && isMobileSheet()) onToggleCollapse();
+  }
+
+  function openCounty(geoid) {
+    onOpenCounty?.(geoid);
+    minimizeIfMobile();
+  }
+
+  function pickLocation(item) {
+    onLocationPick?.(item);
+    minimizeIfMobile();
+  }
+
   return (
     <div className={`control-panel ${collapsed ? "collapsed" : ""}${wagesLoading ? " is-loading" : ""}`}>
       {wagesLoading && (
         <div className="panel-loading" role="status" aria-live="polite">Updating map</div>
       )}
-      <div
-        className="title-row"
-        onClick={onToggleCollapse}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onToggleCollapse();
-        }}
-        aria-label={collapsed ? ui.panel.expandAriaLabel : ui.panel.collapseAriaLabel}
-      >
-        <div className="title">
-          <img className="app-mark" src={app.markSrc} width="22" height="22" alt="" />
-          {app.name}
-        </div>
-        <div className="collapse-icon" title={collapsed ? ui.panel.expandTitle : ui.panel.collapseTitle}>
+      <div className="title-row">
+        <button type="button" className="title-hit" onClick={onToggleCollapse} aria-label={collapsed ? ui.panel.expandAriaLabel : ui.panel.collapseAriaLabel}>
+          <div className="title">
+            <img className="app-mark" src={app.markSrc} width="22" height="22" alt="" />
+            {app.name}
+          </div>
+        </button>
+        <button
+          type="button"
+          className="panel-close"
+          aria-label={collapsed ? ui.panel.expandAriaLabel : ui.panel.closeLabel || ui.panel.collapseAriaLabel}
+          title={collapsed ? ui.panel.expandTitle : ui.panel.closeTitle || ui.panel.collapseTitle}
+          onClick={onToggleCollapse}
+        >
           {collapsed ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 9l6 6 6-6H6z" /></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 9l6 6 6-6H6z" /></svg>
           ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 15l6-6 6 6H6z" /></svg>
+            <span aria-hidden="true">×</span>
           )}
-        </div>
+        </button>
       </div>
 
       {!collapsed && (
@@ -142,13 +148,7 @@ export default function ControlPanel({
             <div className="salary-row">
               <div className="salary-input">
                 <span>{formatting.currencySymbol}</span>
-                <input
-                  type="text"
-                  value={formatCurrency(salary)}
-                  inputMode="numeric"
-                  style={{ paddingRight: ui.salary.inputPaddingRight }}
-                  onChange={(e) => onSalaryChange(e.target.value)}
-                />
+                <input type="text" value={formatCurrency(salary)} inputMode="numeric" style={{ paddingRight: ui.salary.inputPaddingRight }} onChange={(e) => onSalaryChange(e.target.value)} />
                 {salary !== "" && (
                   <button type="button" className="clear-btn" aria-label={ui.salary.clearLabel} onClick={onClearSalary}>×</button>
                 )}
@@ -161,7 +161,7 @@ export default function ControlPanel({
               <label className="label">{ui.location.label}</label>
               <span className="hint">{ui.location.hint}</span>
             </div>
-            <LocationSearch index={locationIndex} onPick={onLocationPick} />
+            <LocationSearch index={locationIndex} onPick={pickLocation} />
             <div className="region-row" aria-label={ui.location.regionsLabel}>
               {(ui.location.regions || []).map((region) => (
                 <button type="button" key={region.id} className="region-chip" onClick={() => onRegionJump?.(region.id)}>
@@ -172,14 +172,11 @@ export default function ControlPanel({
             <div className="row">
               <select className="select-box select-half" value={selectedState} onChange={(e) => onStateChange(e.target.value)}>
                 <option value="">{ui.location.allStates}</option>
-                {stateOptions
-                  .slice()
-                  .sort((a, b) => (STATE_ABBR_TO_NAME[a] || a).localeCompare(STATE_ABBR_TO_NAME[b] || b))
-                  .map((abbr) => (
-                    <option key={abbr} value={abbr}>{STATE_ABBR_TO_NAME[abbr] || abbr}</option>
-                  ))}
+                {stateOptions.slice().sort((a, b) => (STATE_ABBR_TO_NAME[a] || a).localeCompare(STATE_ABBR_TO_NAME[b] || b)).map((abbr) => (
+                  <option key={abbr} value={abbr}>{STATE_ABBR_TO_NAME[abbr] || abbr}</option>
+                ))}
               </select>
-              <select className="select-box select-half" value={selectedCounty} onChange={(e) => onCountyChange(e.target.value)} disabled={!selectedState}>
+              <select className="select-box select-half" value={selectedCounty} onChange={(e) => { onCountyChange(e.target.value); if (e.target.value) minimizeIfMobile(); }} disabled={!selectedState}>
                 <option value="">{selectedState ? ui.location.selectCounty : ui.location.pickStateFirst}</option>
                 {countyOptions.map((county) => (
                   <option key={county.geoid} value={county.geoid}>{county.name}</option>
@@ -225,7 +222,7 @@ export default function ControlPanel({
                   <ul className="insight-list">
                     {(insights.highLevel || []).map((row) => (
                       <li key={`high-${row.geoid}`}>
-                        <button type="button" onClick={() => onOpenCounty?.(row.geoid)}>
+                        <button type="button" onClick={() => openCounty(row.geoid)}>
                           <span>{row.name}, {row.state}</span>
                           <span className="insight-meta">L{levels.keys[row.level - 1]}</span>
                         </button>
@@ -238,7 +235,7 @@ export default function ControlPanel({
                   <ul className="insight-list">
                     {(insights.cheapestLevelII || []).map((row) => (
                       <li key={`cheap-${row.geoid}`}>
-                        <button type="button" onClick={() => onOpenCounty?.(row.geoid)}>
+                        <button type="button" onClick={() => openCounty(row.geoid)}>
                           <span>{row.name}, {row.state}</span>
                           <span className="insight-meta">{formatAnnual(row.levelIIAnnual)} L2</span>
                         </button>
@@ -266,7 +263,7 @@ export default function ControlPanel({
                       <th>Level</th>
                       {compareCounties.map((county) => (
                         <th key={county.geoid}>
-                          <button type="button" className="compare-head" onClick={() => onOpenCounty?.(county.geoid)}>{county.name}</button>
+                          <button type="button" className="compare-head" onClick={() => openCounty(county.geoid)}>{county.name}</button>
                           <button type="button" className="compare-remove" aria-label={ui.compare.removeLabel} onClick={() => onRemoveCompare?.(county.geoid)}>×</button>
                         </th>
                       ))}
@@ -289,11 +286,7 @@ export default function ControlPanel({
                       <td>Now</td>
                       {compareCounties.map((county) => (
                         <td key={`${county.geoid}-now`}>
-                          {county.level > 0
-                            ? `Level ${levels.keys[county.level - 1]}`
-                            : county.level === 0
-                              ? levels.labels.belowLevel
-                              : levels.labels.noData}
+                          {county.level > 0 ? `Level ${levels.keys[county.level - 1]}` : county.level === 0 ? levels.labels.belowLevel : levels.labels.noData}
                         </td>
                       ))}
                     </tr>
